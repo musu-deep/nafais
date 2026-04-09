@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>نفائس | لوحة تفاعلية للمبادرات والممارسات</title>
+<style>
+:root{
+  --bg:#07111f;
+  --bg2:#0b1a31;
+  --panel:rgba(255,255,255,.10);
+  --panel-2:rgba(255,255,255,.14);
+  --line:rgba(255,255,255,.18);
+  --txt:#ecf4ff;
+  --muted:#b8c8df;
+  --blue:#3b82f6;
+  --blue2:#60a5fa;
+  --cyan:#93c5fd;
+  --accent:#dbeafe;
+  --good:#34d399;
+  --shadow:0 16px 40px rgba(0,0,0,.28);
+  --radius:24px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:"IBM Plex Sans Arabic","Segoe UI","Tahoma",sans-serif;
+  color:var(--txt);
+  background:
+    radial-gradient(circle at top right, rgba(59,130,246,.25), transparent 26%),
+    radial-gradient(circle at left 20%, rgba(147,197,253,.18), transparent 28%),
+    linear-gradient(180deg, #06101d 0%, #0b1830 55%, #08111f 100%);
+  min-height:100vh;
+}
+body::before{
+  content:"";
+  position:fixed; inset:0;
+  background:
+    linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+  background-size:32px 32px;
+  mask-image:linear-gradient(180deg, rgba(0,0,0,.65), transparent 85%);
+  pointer-events:none;
+}
+a{color:inherit; text-decoration:none}
+.container{width:min(1420px, calc(100vw - 48px)); margin:0 auto}
+.glass{
+  background:linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.08));
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:var(--shadow);
+}
+.topbar{
+  position:sticky; top:0; z-index:50;
+  backdrop-filter:blur(18px);
+  background:rgba(6,16,29,.62);
+  border-bottom:1px solid rgba(255,255,255,.09);
+}
+.topbar-inner{display:flex; align-items:center; justify-content:space-between; gap:18px; padding:14px 0}
+.brand{display:flex; align-items:center; gap:14px}
+.brand-badge{
+  width:44px; height:44px; border-radius:14px;
+  background:linear-gradient(135deg, rgba(219,234,254,.95), rgba(59,130,246,.55));
+  box-shadow:0 10px 22px rgba(59,130,246,.3), inset 0 1px 0 rgba(255,255,255,.65);
+  position:relative;
+}
+.brand-badge::after{content:""; position:absolute; inset:8px; border-radius:10px; border:1px solid rgba(255,255,255,.6)}
+.brand h1{margin:0; font-size:1.15rem; letter-spacing:.2px}
+.brand small{display:block; color:var(--muted); margin-top:4px}
+.nav{display:flex; gap:10px; flex-wrap:wrap}
+.nav a{
+  padding:10px 14px; border-radius:999px;
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);
+  color:#dfeafb; font-size:.92rem;
+}
+.hero{padding:34px 0 24px}
+.hero-shell{
+  display:grid; grid-template-columns:1.45fr .95fr; gap:22px;
+  padding:26px; border-radius:32px; position:relative; overflow:hidden;
+}
+.hero-shell::before{
+  content:""; position:absolute; inset:-30% auto auto -10%; width:420px; height:420px; border-radius:50%;
+  background:radial-gradient(circle, rgba(147,197,253,.28), transparent 60%);
+}
+.hero-shell::after{
+  content:""; position:absolute; inset:auto -5% -35% auto; width:420px; height:420px; border-radius:50%;
+  background:radial-gradient(circle, rgba(59,130,246,.22), transparent 60%);
+}
+.hero-copy,.hero-side{position:relative; z-index:1}
+.eyebrow{display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:rgba(219,234,254,.08); border:1px solid rgba(219,234,254,.15); color:#d8e8ff; font-size:.9rem}
+.hero h2{font-size:clamp(2rem,4vw,3.8rem); line-height:1.1; margin:16px 0 14px; max-width:10ch}
+.hero p{color:var(--muted); font-size:1.04rem; line-height:1.9; margin:0 0 20px; max-width:68ch}
+.hero-actions{display:flex; gap:12px; flex-wrap:wrap; margin-top:18px}
+.btn{
+  padding:13px 18px; border-radius:16px; border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.06); color:var(--txt); font-weight:700;
+}
+.btn.primary{background:linear-gradient(135deg, rgba(219,234,254,.94), rgba(96,165,250,.72)); color:#06101d; border-color:transparent}
+.metrics-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:14px}
+.metric-card{padding:18px; border-radius:22px; position:relative; overflow:hidden}
+.metric-card::after{content:""; position:absolute; inset:auto -20px -40px auto; width:120px; height:120px; border-radius:50%; background:radial-gradient(circle, rgba(255,255,255,.12), transparent 60%)}
+.metric-card b{display:block; font-size:2rem; margin:6px 0 4px}
+.metric-card span{color:var(--muted); font-size:.95rem}
+.kpi-ribbon{display:grid; grid-template-columns:repeat(5,1fr); gap:16px; margin-top:20px}
+.kpi{
+  padding:18px; border-radius:22px; text-align:center;
+}
+.kpi strong{display:block; font-size:1.7rem; margin-bottom:6px}
+.kpi small{color:var(--muted); line-height:1.6}
+.section{padding:16px 0 6px}
+.section-head{display:flex; align-items:end; justify-content:space-between; gap:14px; margin:8px 0 18px}
+.section-head h3{margin:0; font-size:1.5rem}
+.section-head p{margin:8px 0 0; color:var(--muted)}
+.insights{display:grid; grid-template-columns:1.1fr .9fr; gap:18px}
+.panel{padding:22px; border-radius:26px}
+.bullets{display:grid; gap:12px}
+.bullet{display:flex; gap:12px; align-items:flex-start; padding:14px; border-radius:18px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08)}
+.dot{width:14px; height:14px; border-radius:50%; margin-top:6px; background:linear-gradient(135deg, var(--cyan), var(--blue))}
+.mini-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:14px}
+.mini-card{padding:18px; border-radius:20px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08)}
+.mini-card strong{display:block; font-size:1.35rem; margin-bottom:8px}
+.charts-grid{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+.chart-card{padding:20px; border-radius:26px}
+.chart-title{font-size:1.08rem; margin:0 0 12px}
+.chart-sub{color:var(--muted); margin:0 0 16px; font-size:.92rem}
+.chart{width:100%;}
+.bar-row{display:grid; grid-template-columns:140px 1fr 52px; align-items:center; gap:12px; margin:10px 0}
+.bar-row small{color:#dce9fb}
+.track{height:12px; border-radius:999px; background:rgba(255,255,255,.08); overflow:hidden; border:1px solid rgba(255,255,255,.07)}
+.fill{height:100%; border-radius:inherit; background:linear-gradient(90deg, rgba(147,197,253,.85), rgba(59,130,246,.95)); box-shadow:0 4px 14px rgba(59,130,246,.35)}
+.badge-cloud{display:flex; flex-wrap:wrap; gap:10px; margin-top:12px}
+.badge{padding:10px 12px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); color:#dbe9fc; font-size:.9rem}
+.heatmap-wrap{overflow:auto; border-radius:24px; border:1px solid rgba(255,255,255,.08)}
+table{width:100%; border-collapse:separate; border-spacing:0; min-width:980px; background:rgba(9,20,37,.5)}
+th,td{padding:14px 12px; text-align:center; border-bottom:1px solid rgba(255,255,255,.08); border-left:1px solid rgba(255,255,255,.06)}
+th{position:sticky; top:0; background:rgba(10,24,43,.92); z-index:2; font-weight:700}
+th:first-child,td:first-child{position:sticky; right:0; background:rgba(10,24,43,.95); z-index:1; text-align:right; min-width:170px}
+.heat{font-weight:700}
+.explorer{display:grid; grid-template-columns:370px 1fr; gap:18px}
+.explorer .panel{min-height:690px}
+.toolbar{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px}
+.search, select{
+  width:100%;
+  padding:13px 14px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.10);
+  background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+  color:var(--txt);
+  outline:none;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 8px 22px rgba(0,0,0,.14);
+}
+.search::placeholder{color:#9db2d1}
+select{
+  cursor:pointer;
+  appearance:none;
+  -webkit-appearance:none;
+  -moz-appearance:none;
+  padding-left:42px;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #dfeafb 50%),
+    linear-gradient(135deg, #dfeafb 50%, transparent 50%),
+    linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+  background-position:
+    calc(14px) calc(50% - 2px),
+    calc(8px) calc(50% - 2px),
+    center center;
+  background-size:6px 6px, 6px 6px, 100% 100%;
+  background-repeat:no-repeat;
+}
+select:focus, .search:focus{
+  border-color:rgba(147,197,253,.45);
+  box-shadow:0 0 0 3px rgba(59,130,246,.16), inset 0 1px 0 rgba(255,255,255,.06), 0 10px 24px rgba(0,0,0,.18);
+}
+select option,
+select optgroup{
+  background:#12233b;
+  color:#f3f8ff;
+}
+select option:checked,
+select option:hover,
+select option:focus{
+  background:linear-gradient(180deg, #2b67da, #3b82f6);
+  color:#ffffff;
+}
+.list{display:grid; gap:10px; max-height:560px; overflow:auto; padding-left:4px}
+.item{
+  padding:14px 14px 14px 16px; border-radius:18px;
+  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
+  cursor:pointer; transition:.2s ease;
+}
+.item:hover,.item.active{background:rgba(219,234,254,.10); border-color:rgba(147,197,253,.35); transform:translateY(-1px)}
+.item h4{margin:0 0 8px; font-size:1rem}
+.item .meta{display:flex; flex-wrap:wrap; gap:8px; color:var(--muted); font-size:.85rem}
+.detail-head{display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding-bottom:18px; border-bottom:1px solid rgba(255,255,255,.08)}
+.detail-head h4{margin:0; font-size:1.8rem; line-height:1.3}
+.detail-head p{margin:8px 0 0; color:var(--muted)}
+.pill{display:inline-flex; align-items:center; padding:8px 12px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.09); color:#dbebff; font-size:.9rem}
+.detail-grid{display:grid; grid-template-columns:1.1fr .9fr; gap:16px; margin-top:18px}
+.detail-card{padding:18px; border-radius:22px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08)}
+.detail-card h5{margin:0 0 12px; font-size:1rem}
+.detail-card p{margin:0; color:var(--muted); line-height:1.9}
+.tags{display:flex; flex-wrap:wrap; gap:10px}
+.tag{padding:10px 12px; border-radius:14px; background:rgba(59,130,246,.12); border:1px solid rgba(147,197,253,.18); color:#eaf2ff; font-size:.92rem}
+.nav-buttons{display:flex; gap:10px; margin-top:18px}
+.footer{padding:24px 0 36px; color:var(--muted); font-size:.9rem}
+.footer .glass{padding:18px 20px; border-radius:22px}
+.smallnote{color:var(--muted); font-size:.84rem; line-height:1.8}
+@media (max-width: 1180px){
+  .hero-shell,.insights,.charts-grid,.explorer,.detail-grid{grid-template-columns:1fr}
+  .kpi-ribbon{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width: 760px){
+  .container{width:min(100vw - 24px, 1420px)}
+  .topbar-inner{flex-direction:column; align-items:flex-start}
+  .metrics-grid,.mini-grid,.toolbar,.kpi-ribbon{grid-template-columns:1fr}
+  .bar-row{grid-template-columns:110px 1fr 40px}
+  .explorer{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="container topbar-inner">
+      <div class="brand">
+        <div class="brand-badge"></div>
+        <div>
+          <h1>مبادرة نفائس | لوحة تفاعلية </h1>
+          <small>نسخة تنفيذية لعرض أبرز الممارسات ومساهمات الجمعيات مع إمكانية قراءة وتنقل تفصيلي بين المبادرات</small>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="#overview">نظرة عامة</a>
+        <a href="#charts">المؤشرات</a>
+        <a href="#heatmap">الخارطة الحرارية</a>
+        <a href="#initiatives">استعراض المبادرات</a>
+      </nav>
+    </div>
+  </div>
+
+  <header class="hero">
+    <div class="container">
+      <div class="hero-shell glass" id="overview">
+        <div class="hero-copy">
+          <span class="eyebrow">مبادرة نفائس • لوحة تنفيذية تفاعلية</span>
+          <h2> مبادرة نفائس</h2>
+          <p>
+            حصر وتوثيق أفضل الممارسات والتجارب التنموية المتميزة للجمعيات الأهلية بمنطقة مكة المكرمة، مع مؤشرات مرئية ورسومات
+            بيانية وخارطة حرارية للمجالات وتوزيعها على المحافظات | برعاية مجلس الجمعيات الأهلية بمنطقة مكة المكرمة .
+          </p>
+          <div class="hero-actions">
+            <a class="btn primary" href="#initiatives">ابدأ استعراض المبادرات</a>
+            <a class="btn" href="#heatmap">الانتقال إلى الخارطة الحرارية</a>
+          </div>
+        </div>
+        <div class="hero-side">
+          <div class="metrics-grid">
+            <div class="metric-card glass">
+              <span>إجمالي الممارسات المتميزة</span>
+              <b>36</b>
+              <span>كما ورد تحليل الاستبانة والملخص الختامي للوثيقة</span>
+            </div>
+            <div class="metric-card glass">
+              <span>الجهات/الجمعيات المشاركة</span>
+              <b>36</b>
+              <span>استجابات مكتملة وممارسات متنوعة</span>
+            </div>
+            <div class="metric-card glass">
+              <span>توزيع التجارب حسب المحافظات</span>
+              <b>7</b>
+              <span>مكة، جدة، خليص، الطائف، الليث، القنفذة، رنية</span>
+            </div>
+            <div class="metric-card glass">
+              <span>ممارسات ذات أثر كمي موثق</span>
+              <b>12</b>
+              <span>مع مؤشرات أعداد المستفيدين والمتطوعين والمخرجات</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="kpi-ribbon">
+        <div class="kpi glass"><strong>22%</strong><small>التعليم هو المجال الأكثر حضوراً في التوزيع التنموي</small></div>
+        <div class="kpi glass"><strong>50%</strong><small>مكة المكرمة تستحوذ على أعلى كثافة للممارسات</small></div>
+        <div class="kpi glass"><strong>94%</strong><small>أعلى معيار توثيق متحقق: بيانات التواصل</small></div>
+        <div class="kpi glass"><strong>12</strong><small>ممارسات مستدامة لأكثر من عام</small></div>
+        <div class="kpi glass"><strong>89%</strong><small>ممارسات عالية القابلية للنقل أو النشر وفق الخريطة</small></div>
+      </div>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container insights">
+      <div class="panel glass">
+        <div class="section-head">
+          <div>
+            <h3>تحليل تنفيذي</h3>
+            <p>أين تتجمع القوة؟ وأين تظهر فرصة الإنضاج المؤسسي؟</p>
+          </div>
+        </div>
+        <div class="bullets">
+          <div class="bullet"><div class="dot"></div><div><strong>التمركز الجغرافي .</strong><div class="smallnote">الكتلة الأكبر من الممارسات جاءت من مكة المكرمة، تليها جدة، ما يعكس تمركز النشاط التنموي في الحواضر الرئيسية مع مساحة توسع قائمة للمحافظات الأقل تمثيلاً.</div></div></div>
+          <div class="bullet"><div class="dot"></div><div><strong>أكثر المجالات مشاركة</strong><div class="smallnote">مجال التعليم الأعلى من حيث المشاركة ويشير إلى جاهزية هذا المجال لبناء مسارات تعميم وتبادل خبرات أسرع من بقية المجالات.</div></div></div>
+          <div class="bullet"><div class="dot"></div><div><strong>جودة توثيق المبادرات</strong><div class="smallnote">الأهداف والتواصل موثقان بشكل جيد، لكن المخرجات والمنتجات التفصيلية ما زالت أدنى، ما يبرر توحيد إطار التوثيق ورفع جودة القياس.</div></div></div>
+          <div class="bullet"><div class="dot"></div><div><strong>الفرص الأعلى قيمة</strong><div class="smallnote">تحويل الممارسات ذات الأثر الكمي، والاستدامة، والشراكات الناجحة إلى مكتبة مرجعية قابلة للنقل والتبني القطاعي.</div></div></div>
+        </div>
+      </div>
+      <div class="panel glass">
+        <div class="section-head">
+          <div>
+            <h3>أبرز النقاط المميزة</h3>
+            <p>مستخلصة من نتائج التحليل الواردة في الوثيقة</p>
+          </div>
+        </div>
+        <div class="mini-grid">
+          <div class="mini-card"><strong>أثر كمي بارز</strong><span class="smallnote">35 ألف مستفيد في "علمني الفاتحة"، و120 ألف متطوع مسجل في "متطوعو دعوة الليث".</span></div>
+          <div class="mini-card"><strong>معيار الاستدامة </strong><span class="smallnote">12 ممارسة مستدامة، و10 ممارسات تستند إلى شراكات ناجحة، و8 تستخدم أدوات قياس أثر منهجية.</span></div>
+          <div class="mini-card"><strong>ابتكار تطبيقي</strong><span class="smallnote">من مبادرات التحول الرقمي والذكاء الاصطناعي إلى الابتكار البيئي والاجتماعي ووحدات الاستثمار الاجتماعي.</span></div>
+          <div class="mini-card"><strong>قابلية النقل</strong><span class="smallnote">عدد كبير من الممارسات مصنف كقابل للنقل مباشرة أو بتهيئة بسيطة، ما يجعل المبادرة أساساً لبناء موسوعة معرفية عملية.</span></div>
+        </div>
+        <div class="badge-cloud">
+          <span class="badge">تعليم</span>
+          <span class="badge">خدمة ضيوف الرحمن</span>
+          <span class="badge">تمكين المرأة</span>
+          <span class="badge">أثر كمي</span>
+          <span class="badge">استدامة</span>
+          <span class="badge">شراكات</span>
+          <span class="badge">قياس أثر</span>
+          <span class="badge">قابلية نقل</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="charts">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <h3>المؤشرات والرسومات البيانية</h3>
+          <p>تلخيص بصري لأهم التوزيعات ومؤشرات الجودة والتميز</p>
+        </div>
+      </div>
+      <div class="charts-grid">
+        <div class="chart-card glass">
+          <h4 class="chart-title">التوزيع الجغرافي للممارسات</h4>
+          <p class="chart-sub">يعرض كثافة الممارسات حسب المحافظة وفق الجداول التحليلية في الوثيقة</p>
+          <div id="govChart" class="chart"></div>
+        </div>
+        <div class="chart-card glass">
+          <h4 class="chart-title">التوزيع حسب المجال التنموي</h4>
+          <p class="chart-sub">قراءة سريعة للمجالات الأكثر حضوراً داخل مبادرة نفائس</p>
+          <div id="domainChart" class="chart"></div>
+        </div>
+        <div class="chart-card glass">
+          <h4 class="chart-title">جودة التوثيق للممارسات</h4>
+          <p class="chart-sub">قياس مدى اكتمال العناصر الأساسية في وصف الممارسة التنموية</p>
+          <div id="qualityChart" class="chart"></div>
+        </div>
+        <div class="chart-card glass">
+          <h4 class="chart-title">عناصر التميز والابتكار</h4>
+          <p class="chart-sub">ماذا يميز الممارسات التي برزت داخل العينة؟</p>
+          <div id="excellenceChart" class="chart"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="heatmap">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <h3>الخارطة الحرارية للمجالات والمحافظات</h3>
+          <p>مصفوفة بصرية تساعد على التقاط التمركزات، والفراغات، وفرص التوسع القطاعي</p>
+        </div>
+      </div>
+      <div class="panel glass">
+        <div class="heatmap-wrap">
+          <table id="heatmapTable"></table>
+        </div>
+        <p class="smallnote" style="margin-top:14px">
+          كثافة اللون الأعلى = تركّز أكبر للممارسات. صُممت هذه الخارطة لتسهّل قراءة مواطن القوة، وتحديد المحافظات أو المجالات التي تستحق استهدافاً أكبر في النسخ القادمة من المبادرة.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="initiatives">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <h3>مستكشف المبادرات والممارسات</h3>
+          <p>تنقل سهل بين المبادرات مع عرض تفصيلي وقراءة تنفيذية لكل ممارسة</p>
+        </div>
+      </div>
+      <div class="explorer">
+        <aside class="panel glass">
+          <div class="toolbar">
+            <input id="searchInput" class="search" type="search" placeholder="ابحث باسم المبادرة أو الجمعية..." />
+            <select id="filterGov"><option value="">كل المحافظات</option></select>
+          </div>
+          <div class="toolbar">
+            <select id="filterDomain"><option value="">كل المجالات</option></select>
+            <div class="pill" id="resultCount">38 ممارسة</div>
+          </div>
+          <div id="initiativeList" class="list"></div>
+        </aside>
+        <main class="panel glass">
+          <div class="detail-head">
+            <div>
+              <div id="detailChip" class="pill">ممارسة رقم 1</div>
+              <h4 id="detailTitle"></h4>
+              <p id="detailMeta"></p>
+            </div>
+            <div class="pill" id="detailTransfer"></div>
+          </div>
+          <div class="detail-grid">
+            <div class="detail-card">
+              <h5>نبذة مختصرة</h5>
+              <p id="detailSummary"></p>
+            </div>
+            <div class="detail-card">
+              <h5>المخرجات / الآثار</h5>
+              <p id="detailOutputs"></p>
+            </div>
+            <div class="detail-card">
+              <h5>أبرز مؤشرات التميز</h5>
+              <div id="detailTags" class="tags"></div>
+            </div>
+            <div class="detail-card">
+              <h5>قراءة تنفيذية</h5>
+              <p id="detailReadout"></p>
+            </div>
+          </div>
+          <div class="nav-buttons">
+            <button id="prevBtn" class="btn">السابق</button>
+            <button id="nextBtn" class="btn primary">التالي</button>
+          </div>
+        </main>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="glass">
+        <div>تم إعداد هذه الوثيقة الرقمية لعرض مخرجات مبادرة نفائس لحصر وتوثيق التجارب التنموية الرائدة | مجلس الجمعيات الأهلية بمنطقة مكة المكرمة | إعداد مجموعة اراك للتنمية | 2026</div>
+      </div>
+    </div>
+  </footer>
+
+<script>
+const initiatives = [{"id": 1, "gov": "مكة المكرمة", "domain": "خدمة ضيوف الرحمن", "title": "بيوتات مكية", "org": "جمعية ملبية لإكرام ضيفات الرحمن", "summary": "تجربة ضيافة مجتمعية داخل بيوت مكة لاستقبال ضيفات الرحمن وإبراز الكرم المكي.", "excellence": ["نقل الضيافة من النمط المؤسسي إلى المجتمعي", "تمكين الأسر والمتطوعات", "94 ضيفة من عدة دول"], "outputs": "4 لقاءات ضيافة، 94 ضيفة، 12 متطوعة، قاعدة بيانات للأسر والمتطوعات", "transfer": 5}, {"id": 2, "gov": "مكة المكرمة", "domain": "خدمة ضيوف الرحمن", "title": "ترجمان", "org": "جمعية ملبية لإكرام ضيفات الرحمن", "summary": "برنامج يستقطب ويؤهل مترجمات متطوعات لخدمة ضيفات الرحمن بلغات متعددة.", "excellence": ["تخصص نسائي لغوي", "50 مترجمة مؤهلة", "5 لغات و320 ساعة تطوعية"], "outputs": "50 مترجمة، 8 لقاءات، 320 ساعة تطوعية، 70 مستفيدة", "transfer": 5}, {"id": 3, "gov": "مكة المكرمة", "domain": "التعليم", "title": "الإثراء العلمي والأخلاقي لضيوف الرحمن بالمشاعر المقدسة", "org": "جمعية بناء بمكة المكرمة", "summary": "تجربة معرفية تجمع بين التكريم والإفادة العلمية للحجاج والمعتمرين والزوار.", "excellence": ["25 وحدة بحثية", "استهداف أكثر من 150 شركة حج", "خدمة 30 ألف حاج"], "outputs": "25 وحدة بحثية، 30 كادراً، انطباعات إيجابية ورفع الوعي", "transfer": 4}, {"id": 4, "gov": "مكة المكرمة", "domain": "التعليم", "title": "فطرة", "org": "جمعية تدارس التعليمية", "summary": "برنامج تربوي قيمي للأطفال يغرس الإيمان والقيم القرآنية في الروضات والمعاهد وحلقات التحفيظ.", "excellence": ["300 معلمة", "5000 حقيبة تعليمية", "50 شراكة"], "outputs": "50 شراكة، 10 دورات، 300 معلمة، 5000 طفل", "transfer": 5}, {"id": 5, "gov": "مكة المكرمة", "domain": "التعليم", "title": "أبجد", "org": "جمعية وممة للتعليم والتدريب", "summary": "برنامج نوعي لتمكين طلاب الصفوف الأولية من مهارات القراءة والكتابة عبر القرآن.", "excellence": ["54% من المستفيدين أيتام", "مركز ثالث على مستوى المملكة", "منهج واضح قابل للتكرار"], "outputs": "165 مستفيداً منهم 90 يتيماً، تحسن تحصيلي وثقة بالنفس", "transfer": 5}, {"id": 6, "gov": "مكة المكرمة", "domain": "التعليم", "title": "نادي الذكاء الاصطناعي", "org": "جمعية وممة للتعليم والتدريب", "summary": "برنامج تدريبي مكثف لتوظيف الذكاء الاصطناعي التوليدي في التعليم والبرمجة وصناعة المحتوى والأتمتة.", "excellence": ["تركيز على الأتمتة لا الاستخدام فقط", "Make.com وربط الأدوات", "تحسين الكفاءة الإدارية"], "outputs": "منهج متخصص، محتوى إداري مدعوم بالذكاء الاصطناعي، تطوير مهني", "transfer": 5}, {"id": 7, "gov": "مكة المكرمة", "domain": "خدمة ضيوف الرحمن", "title": "معين", "org": "جمعية وممة للتعليم والتدريب", "summary": "برنامج لغوي لتمكين الحجاج والمعتمرين غير الناطقين بالعربية من فهم الألفاظ والأدعية المتعلقة بالمناسك.", "excellence": ["135 مستفيداً", "تنفيذ ميداني 6 أيام", "رفع الطمأنينة والثقة"], "outputs": "حقيبة تدريبية، مؤشرات رضا، تواصل فعال مع مقدمي الخدمة", "transfer": 5}, {"id": 8, "gov": "مكة المكرمة", "domain": "تأهيل وتمكين المرأة", "title": "التمكين الاقتصادي", "org": "جمعية أم القرى الخيرية النسائية", "summary": "تمكين الأسر لتحسين دخلها عبر مشاريع صغيرة مع استخدام نموذج منهجي لقياس الأثر.", "excellence": ["قياس أثر قبلي وبعدي", "بيئة تدريبية متكاملة", "تركيز على الاستدامة"], "outputs": "لم توثق المخرجات بالتفصيل في الاستبانة", "transfer": 4}, {"id": 9, "gov": "مكة المكرمة", "domain": "التعليم", "title": "علم نفس الاتصال (الأنماط التمثيلية)", "org": "مؤسسة روافد للعلوم الأهلية", "summary": "تطبيق تشخيصي لتحسين كفاءة التواصل الإنساني لدى الطلبة وفق الأنماط التمثيلية.", "excellence": ["أدوات تشخيصية عملية", "تحسن التأثير والتواصل", "تقليل النزاعات وسوء الفهم"], "outputs": "نماذج تشخيص وتقارير تقييم ورفع الوعي بالفروق الفردية", "transfer": 5}, {"id": 10, "gov": "مكة المكرمة", "domain": "تأهيل وتمكين المرأة", "title": "المستقبليات والتنبؤ بالمهن", "org": "مؤسسة روافد للعلوم الأهلية", "summary": "برنامج أكاديمي تطبيقي يدمج دراسة الاتجاهات العالمية والمهارات المستقبلية باحتياجات سوق العمل.", "excellence": ["مشاريع طلابية استشرافية", "ربط التعلم بالمسارات المهنية", "رفع الجاهزية لسوق العمل المستقبلي"], "outputs": "تقارير تحليل مهني وخطط مسار فردية", "transfer": 4}, {"id": 11, "gov": "مكة المكرمة", "domain": "المجال الاجتماعي", "title": "إجلال لكبيرات السن", "org": "جمعية الصديقة التعليمية", "summary": "برنامج تعليمي اجتماعي قيمي يخدم كبيرات السن في مكة عبر التعليم وتعزيز القيم.", "excellence": ["إقبال كبير من المستفيدات", "شراكات ناجحة", "دمج التعليم بالقيم"], "outputs": "رضا عالٍ من المستفيدات", "transfer": 4}, {"id": 12, "gov": "مكة المكرمة", "domain": "خدمة ضيوف الرحمن", "title": "ولك أجر", "org": "جمعية وفود الحرم", "summary": "مبادرة تطوعية متعددة الخدمات لضيوف الرحمن تشمل العربات والإرشاد والأساور والتعطير وغيرها.", "excellence": ["حزمة خدمات تحت مظلة واحدة", "تنظيم تطوعي مؤسسي", "تغطية احتياجات متنوعة"], "outputs": "لم توثق بالتفصيل", "transfer": 5}, {"id": 13, "gov": "مكة المكرمة", "domain": "التعليم", "title": "طموح باحثة", "org": "جمعية تمكين طالبات العلم", "summary": "برنامج نوعي لتنمية المهارات الأساسية والقيم والتفوق البحثي لطالبات الجامعة وما قبلها.", "excellence": ["مسار سنة الاستراحة", "تمكين البحث العلمي", "بناء شخصية قيادية"], "outputs": "تنمية الشخصية القيادية وبناء شخصية متوازنة ومنتجة", "transfer": 5}, {"id": 14, "gov": "مكة المكرمة", "domain": "تحفيظ وتعليم القرآن", "title": "فسيلة", "org": "جمعية اللؤلؤ والمرجان لتعليم السنة لوفد الرحمن", "summary": "برنامج يهتم بحفظ وضبط وشرح الأحاديث النبوية للشباب واليافعين.", "excellence": ["إعداد معلمات متخصصات", "استهداف الشباب", "منهج جاهز"], "outputs": "حفظ الأحاديث وضبطها وزيادة الأعداد", "transfer": 5}, {"id": 15, "gov": "مكة المكرمة", "domain": "تأهيل وتمكين المرأة", "title": "إحرام مستدام", "org": "جمعية أم القرى الخيرية النسائية", "summary": "إعادة توظيف الإحرام المستعمل وتحويله إلى حقائب وهدايا في نموذج يجمع الاستدامة والتمكين الاقتصادي.", "excellence": ["ابتكار بيئي", "فرص عمل للنساء", "منتجات قابلة للاستخدام"], "outputs": "لم توثق بالتفصيل", "transfer": 5}, {"id": 16, "gov": "مكة المكرمة", "domain": "البر والإغاثة", "title": "الأسودان النموذجي", "org": "جمعية البر لقرى جنوب مكة (جوار)", "summary": "مبادرة تنموية رائدة حاصلة على جائزة التميز لعام 2025 في العمل الخيري والإغاثي.", "excellence": ["جائزة التميز 2025", "منهجية متميزة", "نموذج قابل للاقتباس"], "outputs": "الحصول على جائزة التميز", "transfer": 5}, {"id": 17, "gov": "مكة المكرمة", "domain": "تحفيظ وتعليم القرآن", "title": "فسيلة (نسخة ثانية في الوثيقة)", "org": "جمعية اللؤلؤ والمرجان لتعليم السنة لوفد الرحمن", "summary": "إدراج متكرر للممارسة نفسها ضمن خارطة الممارسات بالوثيقة.", "excellence": ["تكرار في الخريطة", "منهج جاهز", "استهداف الشباب"], "outputs": "حفظ الأحاديث وضبطها", "transfer": 5}, {"id": 18, "gov": "مكة المكرمة", "domain": "التعليم", "title": "علم نفس الاتصال (إدراج آخر)", "org": "مؤسسة روافد للعلوم الأهلية", "summary": "إدراج آخر للممارسة نفسها ضمن خارطة الممارسات.", "excellence": ["أدوات جاهزة", "منهجية واضحة", "رفع جودة التواصل"], "outputs": "نماذج تشخيص وتقارير تقييم", "transfer": 5}, {"id": 19, "gov": "جدة", "domain": "رعاية ذوي الاحتياجات الخاصة", "title": "تعويض ذوي البتور", "org": "جمعية خطوة للأطراف الصناعية والتأهيل", "summary": "تأهيل المستفيدين من ذوي البتور للعودة للحياة الطبيعية عبر الأطراف الصناعية والعلاج الطبيعي.", "excellence": ["عودة المستفيد للعمل", "اندماج مجتمعي", "خدمة البيئة المحيطة"], "outputs": "استعادة النشاط اليومي والقيام بالأدوار بشكل طبيعي", "transfer": 4}, {"id": 20, "gov": "جدة", "domain": "المجال الاجتماعي", "title": "كفاية أسرة من الماء", "org": "جمعية حفظ النعمة – استدامة", "summary": "مبادرة للاستدامة المائية ودعم الأسر المحتاجة في جدة عبر توفير احتياجات المياه.", "excellence": ["بعد اجتماعي واستدامي", "فكرة بسيطة قابلة للتطبيق", "قابلية توسع"], "outputs": "لم توثق بالتفصيل", "transfer": 5}, {"id": 21, "gov": "جدة", "domain": "رعاية الأيتام", "title": "معمل الابتكار المهاري", "org": "أيتام جدة", "summary": "ابتكار اجتماعي لتدريب الأيتام على مهارات المستقبل وتأسيس وحدة استثمار اجتماعي.", "excellence": ["قياس SROI", "وحدة استثمار اجتماعي معتمدة", "مهارات STEAM وTEAM"], "outputs": "لم توثق بالتفصيل في الاستبانة", "transfer": 5}, {"id": 22, "gov": "جدة", "domain": "تأهيل وتمكين المرأة", "title": "شجرة القيم المؤسسية", "org": "الجمعية النسائية الخيرية الأولى بجدة", "summary": "مبادرة لترسيخ القيم المؤسسية وثقافة العمل الإيجابية على مدى ثلاث سنوات.", "excellence": ["منهجية علمية بأربع مراحل", "استمرارية 3 سنوات", "شراكة مع لوريال"], "outputs": "برامج تدريب أطفال وشراكات مستدامة", "transfer": 5}, {"id": 23, "gov": "جدة", "domain": "تحفيظ وتعليم القرآن", "title": "تعليم القرآن الكريم لضيوف الرحمن", "org": "جمعية ترتيل لتحفيظ القرآن الكريم", "summary": "برامج تعليمية وتلاوة للقرآن لغير الناطقين بالعربية من الحجاج والمعتمرين.", "excellence": ["فكرة مباشرة قابلة للتطبيق", "خدمة ضيوف الرحمن", "مرونة مكانية"], "outputs": "لم توثق بالتفصيل", "transfer": 5}, {"id": 24, "gov": "جدة", "domain": "التنمية الشبابية", "title": "كفاءات وطن", "org": "جمعية مدارج الشبابية", "summary": "مبادرة للارتقاء بمهارات الشباب وتعزيز دورهم المجتمعي عبر التدريب والتطوع.", "excellence": ["تركيز على الفئة الشبابية", "ساعات تطوعية", "لقاءات دورية"], "outputs": "ساعات تطوعية ولقاءات اجتماعية", "transfer": 5}, {"id": 25, "gov": "جدة", "domain": "المجال الاجتماعي", "title": "سفراء القراءة", "org": "جمعية سندكم لرعاية الأطفال ذوي الظروف الخاصة", "summary": "برنامج لتعزيز الثقافة لدى الأطفال ذوي الظروف الخاصة نُفذ على مستوى محافظات المملكة.", "excellence": ["تقييم 100% من الجهة المانحة", "تنفيذ على مستوى المملكة", "ثقة الجهة المانحة"], "outputs": "لم توثق بالتفصيل", "transfer": 5}, {"id": 26, "gov": "جدة", "domain": "البر والإغاثة", "title": "خدمة نقل وتجهيز الموتى", "org": "جمعية الصفا لإكرام الموتى الأهلية", "summary": "خدمة نقل الموتى خارج جدة بسيارات إسعاف مبردة مع فريق متطوع مستمر.", "excellence": ["92 متطوعاً", "سيارات إسعاف مبردة", "استمرارية الفريق"], "outputs": "لم توثق بالتفصيل", "transfer": 5}, {"id": 27, "gov": "جدة", "domain": "رعاية ذوي الاحتياجات الخاصة", "title": "التأهيل الوظيفي لذوي متلازمة داون", "org": "جمعية متلازمة النجاح", "summary": "تأهيل مهني للشباب والشابات من ذوي متلازمة داون فوق 16 سنة وإدماجهم في سوق العمل.", "excellence": ["توظيف فعلي في شركات كبرى", "سد فجوة ما بعد 16 سنة", "دخل إضافي للأسر"], "outputs": "دمج مجتمعي وتنمية قدرات واعتماد على النفس", "transfer": 5}, {"id": 28, "gov": "خليص", "domain": "البر والإغاثة", "title": "ترميم المنازل", "org": "بر خليص", "summary": "إعادة ترميم منازل المستفيدين بمنهجية تبدأ من الحصر والتكلفة وتنتهي بالتسليم المؤثث.", "excellence": ["أثر مستدام", "تنمية المكان وخدمة الإنسان", "منهجية واضحة"], "outputs": "تحسين البيئة الإسكانية ورفع المستوى المعيشي", "transfer": 5}, {"id": 29, "gov": "خليص", "domain": "تأهيل وتمكين المرأة", "title": "دعم الأسر المنتجة", "org": "بر خليص", "summary": "دعم المشاريع الصغيرة لتحويل الأسر المحتاجة إلى أسر منتجة تحقق الاكتفاء الذاتي.", "excellence": ["تمكين اقتصادي", "استدامة مالية", "تخفيف الأعباء عن الجمعية"], "outputs": "مشاريع تنموية لأسر منتجة واكتفاء ذاتي", "transfer": 5}, {"id": 30, "gov": "خليص", "domain": "البر والإغاثة", "title": "مشروع مساكن", "org": "بر خليص", "summary": "توفير سكن آمن وكريم للأسر الأشد حاجة عبر إنشاء أو ترميم وحدات سكنية مع متابعة لاحقة.", "excellence": ["نهج مستدام", "اختيار دقيق وشفاف", "دعم الفئات الأكثر ضعفاً"], "outputs": "وحدات جاهزة وتحقيق الاستقرار الأسري وتحسين جودة الحياة", "transfer": 4}, {"id": 31, "gov": "خليص", "domain": "تحفيظ وتعليم القرآن", "title": "ترميم المنازل (إدراج آخر في الخارطة)", "org": "بر خليص", "summary": "إدراج آخر للممارسة نفسها ضمن الخارطة الموسعة بالوثيقة.", "excellence": ["منهجية واضحة", "أثر إسكاني مستدام", "رفع المستوى المعيشي"], "outputs": "تحسين البيئة الإسكانية", "transfer": 5}, {"id": 32, "gov": "الطائف", "domain": "البر والإغاثة", "title": "علمني الفاتحة وقصار السور", "org": "جمعية فرقان لتحفيظ القرآن الكريم بالطائف", "summary": "برنامج نوعي لتعليم وتصحيح تلاوة الفاتحة وقصار السور لضيوف الرحمن في الطائف.", "excellence": ["35 ألف مستفيد", "تنفيذ يومي طوال العام", "خدمة أكثر من 5000 زائر شهرياً"], "outputs": "إثراء التجربة الروحية وإبراز جهود المملكة في رعاية القرآن", "transfer": 5}, {"id": 33, "gov": "الطائف", "domain": "التعليم", "title": "لتبقى خضراء", "org": "جمعية اليقظة الخيرية", "summary": "مبادرة بيئية تعزز المسؤولية الاجتماعية والتشجير وزيادة الرقعة الخضراء مع تمكين المرأة.", "excellence": ["تمكين المرأة في العمل البيئي", "نشر ثقافة الاستدامة", "تعزيز المسؤولية الاجتماعية"], "outputs": "لم توثق بالتفصيل", "transfer": 5}, {"id": 34, "gov": "الطائف", "domain": "التنمية الأسرية", "title": "المركز الإسعافي التطوعي", "org": "جمعية الرواد لإدارة الأزمات والكوارث والدعم", "summary": "أول تجربة نوعية على مستوى الطائف لإنشاء مركز إسعافي تطوعي يجمع التدريب والدعم المباشر.", "excellence": ["سد فجوة الاستجابة السريعة", "تكامل مع الجهات الرسمية", "قابلية التوسع"], "outputs": "تدريب المتطوعين ورفع الوعي المجتمعي", "transfer": 4}, {"id": 35, "gov": "الليث", "domain": "تأهيل وتمكين المرأة", "title": "همم عالية", "org": "جمعية رعاية الأيتام بالليث", "summary": "مبادرة لتدريب الأيتام وأمهاتهم مستمرة منذ أكثر من أربع سنوات وحاصلة على تكريم وزاري.", "excellence": ["استمرارية 4 سنوات", "تكريم وزاري", "ظهور إعلامي"], "outputs": "مخرجات متنوعة وتفعيل دور الأيتام وأسرهم", "transfer": 5}, {"id": 36, "gov": "الليث", "domain": "رعاية الأيتام", "title": "متطوعو دعوة الليث", "org": "جمعية الدعوة والإرشاد وتوعية الجاليات بالليث", "summary": "تحول دعوي رقمي استثمر في بناء قاعدة متطوعين ضخمة لنشر المحتوى القيمي بتكلفة شبه صفرية.", "excellence": ["120 ألف متطوع مسجل", "63 ألف مشترك في الواتساب", "عائد اقتصادي مرتفع"], "outputs": "انتشار واسع، حزم جاهزة، قاعدة بيانات رقمية ضخمة", "transfer": 5}, {"id": 37, "gov": "القنفذة", "domain": "رعاية الأيتام", "title": "رعاية يتيم", "org": "البر القوز", "summary": "رعاية أيتام المحافظة عبر توفير السكن والتواصل المباشر وشراء الاحتياجات وتأمين وصولها.", "excellence": ["أكبر عدد من أيتام المنطقة", "تمكين اليتيم مجتمعياً", "نموذج بسيط وفعال"], "outputs": "تخفيف الاحتياج وإزالة المشكلات وإضافة قيمة", "transfer": 5}, {"id": 38, "gov": "رنية", "domain": "رعاية الأيتام", "title": "مشاركة في احتفال استضافة السعودية لكأس العالم بمشاركة الأيتام", "org": "إحسان لرعاية الأيتام بمركز الأملح", "summary": "مبادرة لإشراك الأيتام وأسرهم في الاحتفالات الوطنية لتعزيز الروح الإيجابية والتفاعل المجتمعي.", "excellence": ["دمج الأيتام في الفعاليات الوطنية", "تعزيز التفاعل المجتمعي", "فكرة مبتكرة"], "outputs": "قصص نجاح ومخرجات نوعية وأثر مجتمعي", "transfer": 5}];
+const govSummary = [{"label": "مكة المكرمة", "value": 18}, {"label": "جدة", "value": 8}, {"label": "الطائف", "value": 3}, {"label": "خليص", "value": 4}, {"label": "الليث", "value": 2}, {"label": "القنفذة", "value": 1}, {"label": "رنية", "value": 1}];
+const domainSummary = [{"label": "التعليم", "value": 8}, {"label": "البر والإغاثة", "value": 6}, {"label": "تأهيل وتمكين المرأة", "value": 5}, {"label": "رعاية الأيتام", "value": 4}, {"label": "أخرى / خدمات متنوعة", "value": 4}, {"label": "تحفيظ وتعليم القرآن", "value": 3}, {"label": "رعاية ذوي الاحتياجات الخاصة", "value": 2}, {"label": "المجال الاجتماعي", "value": 2}, {"label": "التنمية الأسرية", "value": 1}, {"label": "التنمية الشبابية", "value": 1}, {"label": "الدعوة إلى الله", "value": 1}];
+const qualitySummary = [{"label": "أهداف محددة", "value": 86}, {"label": "خطوات تنفيذية", "value": 78}, {"label": "مخرجات ومنتجات", "value": 67}, {"label": "آثار وثمار", "value": 72}, {"label": "بيانات تواصل", "value": 94}];
+const excellenceSummary = [{"label": "الاستدامة", "value": 12}, {"label": "الشراكات الناجحة", "value": 10}, {"label": "قياس الأثر", "value": 8}, {"label": "الابتكار", "value": 9}, {"label": "التمكين الاقتصادي", "value": 7}, {"label": "التقنية والذكاء الاصطناعي", "value": 5}, {"label": "التكريم والجوائز", "value": 4}];
+const heatmap = {"مكة المكرمة": {"التعليم": 7, "البر والإغاثة": 1, "تأهيل وتمكين المرأة": 3, "رعاية الأيتام": 0, "خدمة ضيوف الرحمن": 4, "تحفيظ وتعليم القرآن": 2, "رعاية ذوي الاحتياجات الخاصة": 0, "المجال الاجتماعي": 1, "التنمية الأسرية": 0, "التنمية الشبابية": 0}, "جدة": {"التعليم": 0, "البر والإغاثة": 1, "تأهيل وتمكين المرأة": 1, "رعاية الأيتام": 1, "خدمة ضيوف الرحمن": 0, "تحفيظ وتعليم القرآن": 1, "رعاية ذوي الاحتياجات الخاصة": 2, "المجال الاجتماعي": 2, "التنمية الأسرية": 0, "التنمية الشبابية": 1}, "خليص": {"التعليم": 0, "البر والإغاثة": 2, "تأهيل وتمكين المرأة": 1, "رعاية الأيتام": 0, "خدمة ضيوف الرحمن": 0, "تحفيظ وتعليم القرآن": 1, "رعاية ذوي الاحتياجات الخاصة": 0, "المجال الاجتماعي": 0, "التنمية الأسرية": 0, "التنمية الشبابية": 0}, "الطائف": {"التعليم": 1, "البر والإغاثة": 1, "تأهيل وتمكين المرأة": 0, "رعاية الأيتام": 0, "خدمة ضيوف الرحمن": 0, "تحفيظ وتعليم القرآن": 0, "رعاية ذوي الاحتياجات الخاصة": 0, "المجال الاجتماعي": 0, "التنمية الأسرية": 1, "التنمية الشبابية": 0}, "الليث": {"التعليم": 0, "البر والإغاثة": 0, "تأهيل وتمكين المرأة": 1, "رعاية الأيتام": 1, "خدمة ضيوف الرحمن": 0, "تحفيظ وتعليم القرآن": 0, "رعاية ذوي الاحتياجات الخاصة": 0, "المجال الاجتماعي": 0, "التنمية الأسرية": 0, "التنمية الشبابية": 0}, "القنفذة": {"التعليم": 0, "البر والإغاثة": 0, "تأهيل وتمكين المرأة": 0, "رعاية الأيتام": 1, "خدمة ضيوف الرحمن": 0, "تحفيظ وتعليم القرآن": 0, "رعاية ذوي الاحتياجات الخاصة": 0, "المجال الاجتماعي": 0, "التنمية الأسرية": 0, "التنمية الشبابية": 0}, "رنية": {"التعليم": 0, "البر والإغاثة": 0, "تأهيل وتمكين المرأة": 0, "رعاية الأيتام": 1, "خدمة ضيوف الرحمن": 0, "تحفيظ وتعليم القرآن": 0, "رعاية ذوي الاحتياجات الخاصة": 0, "المجال الاجتماعي": 0, "التنمية الأسرية": 0, "التنمية الشبابية": 0}};
+const domains = ["التعليم", "البر والإغاثة", "تأهيل وتمكين المرأة", "رعاية الأيتام", "خدمة ضيوف الرحمن", "تحفيظ وتعليم القرآن", "رعاية ذوي الاحتياجات الخاصة", "المجال الاجتماعي", "التنمية الأسرية", "التنمية الشبابية"];
+const govs = ["مكة المكرمة", "جدة", "خليص", "الطائف", "الليث", "القنفذة", "رنية"];
+
+function renderBars(targetId, items, percentMode=false){
+  const max = Math.max(...items.map(i=>i.value));
+  const el = document.getElementById(targetId);
+  el.innerHTML = items.map(item => {
+    const width = (item.value / max) * 100;
+    return `
+      <div class="bar-row">
+        <small>${item.label}</small>
+        <div class="track"><div class="fill" style="width:${width}%"></div></div>
+        <strong>${item.value}${percentMode ? '%' : ''}</strong>
+      </div>
+    `;
+  }).join('');
+}
+
+renderBars('govChart', govSummary);
+renderBars('domainChart', domainSummary);
+renderBars('qualityChart', qualitySummary, true);
+renderBars('excellenceChart', excellenceSummary);
+
+function heatColor(val, max){
+  const alpha = val === 0 ? .05 : (.14 + (val/max) * .7);
+  return `rgba(96,165,250,${alpha})`;
+}
+function buildHeatmap(){
+  const table = document.getElementById('heatmapTable');
+  const flat = [];
+  govs.forEach(g => domains.forEach(d => flat.push(heatmap[g][d] || 0)));
+  const max = Math.max(...flat, 1);
+  let html = '<thead><tr><th>المحافظة \ المجال</th>' + domains.map(d => `<th>${d}</th>`).join('') + '</tr></thead><tbody>';
+  govs.forEach(g => {
+    html += `<tr><td>${g}</td>`;
+    domains.forEach(d => {
+      const v = heatmap[g][d] || 0;
+      html += `<td class="heat" style="background:${heatColor(v, max)}">${v}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody>';
+  table.innerHTML = html;
+}
+buildHeatmap();
+
+const listEl = document.getElementById('initiativeList');
+const searchInput = document.getElementById('searchInput');
+const filterGov = document.getElementById('filterGov');
+const filterDomain = document.getElementById('filterDomain');
+const resultCount = document.getElementById('resultCount');
+
+[...new Set(initiatives.map(i=>i.gov))].forEach(v=> {
+  const opt = document.createElement('option');
+  opt.value = v; opt.textContent = v; filterGov.appendChild(opt);
+});
+[...new Set(initiatives.map(i=>i.domain))].forEach(v=> {
+  const opt = document.createElement('option');
+  opt.value = v; opt.textContent = v; filterDomain.appendChild(opt);
+});
+
+let filtered = [...initiatives];
+let selectedIndex = 0;
+
+function getExecutiveReadout(item){
+  const transferTxt = item.transfer >= 5 ? 'جاهزة للتعميم السريع' : item.transfer >= 4 ? 'تحتاج تهيئة بسيطة قبل النقل' : 'تحتاج بناء موارد إضافية';
+  const typeHint = item.excellence.some(x => x.includes('قياس') || x.includes('SROI')) ? 'قوتها أنها تستند إلى قياس أثر أو أدوات تقييم.' :
+                   item.excellence.some(x => x.includes('شراكة') || x.includes('لوريال') || x.includes('50 شراكة')) ? 'قوتها أنها تستفيد من الشراكات لتوسيع الأثر.' :
+                   item.excellence.some(x => x.includes('متطوع') || x.includes('تطوعية')) ? 'قوتها في تعبئة رأس المال التطوعي.' :
+                   'قوتها في وضوح الفكرة وإمكانية تحويلها إلى نموذج مؤسسي قابل للتكرار.';
+  return `هذه الممارسة من فئة ${item.domain} في ${item.gov}. ${typeHint} تصنيف القابلية للنقل يشير إلى أنها ${transferTxt}، ما يجعلها مناسبة للعرض ضمن مكتبة مرجعية أو برنامج تبادل خبرات.`;
+}
+
+function renderList(){
+  const q = searchInput.value.trim();
+  filtered = initiatives.filter(i => {
+    const matchGov = !filterGov.value || i.gov === filterGov.value;
+    const matchDomain = !filterDomain.value || i.domain === filterDomain.value;
+    const hay = `${i.title} ${i.org} ${i.summary} ${i.domain} ${i.gov}`;
+    const matchSearch = !q || hay.includes(q);
+    return matchGov && matchDomain && matchSearch;
+  });
+  resultCount.textContent = `${filtered.length} ممارسة`;
+  if(selectedIndex >= filtered.length) selectedIndex = 0;
+  listEl.innerHTML = filtered.map((i, idx) => `
+    <div class="item ${idx === selectedIndex ? 'active' : ''}" data-id="${i.id}" data-idx="${idx}">
+      <h4>${i.title}</h4>
+      <div class="meta">
+        <span>${i.org}</span>
+        <span>•</span>
+        <span>${i.gov}</span>
+        <span>•</span>
+        <span>${i.domain}</span>
+      </div>
+    </div>
+  `).join('');
+  [...listEl.querySelectorAll('.item')].forEach(node => {
+    node.addEventListener('click', () => {
+      selectedIndex = Number(node.dataset.idx);
+      renderList();
+      renderDetail();
+    });
+  });
+  renderDetail();
+}
+
+function renderDetail(){
+  if(!filtered.length){
+    document.getElementById('detailTitle').textContent = 'لا توجد نتائج مطابقة';
+    document.getElementById('detailMeta').textContent = 'جرّب إزالة بعض الفلاتر أو تعديل عبارة البحث.';
+    document.getElementById('detailChip').textContent = '—';
+    document.getElementById('detailTransfer').textContent = '—';
+    document.getElementById('detailSummary').textContent = '';
+    document.getElementById('detailOutputs').textContent = '';
+    document.getElementById('detailTags').innerHTML = '';
+    document.getElementById('detailReadout').textContent = '';
+    return;
+  }
+  const item = filtered[selectedIndex];
+  document.getElementById('detailChip').textContent = `ممارسة رقم ${item.id}`;
+  document.getElementById('detailTitle').textContent = item.title;
+  document.getElementById('detailMeta').textContent = `${item.org} • ${item.gov} • ${item.domain}`;
+  document.getElementById('detailTransfer').textContent = `قابلية النقل: ${item.transfer} / 5`;
+  document.getElementById('detailSummary').textContent = item.summary;
+  document.getElementById('detailOutputs').textContent = item.outputs;
+  document.getElementById('detailTags').innerHTML = item.excellence.map(t => `<span class="tag">${t}</span>`).join('');
+  document.getElementById('detailReadout').textContent = getExecutiveReadout(item);
+}
+
+searchInput.addEventListener('input', () => { selectedIndex = 0; renderList(); });
+filterGov.addEventListener('change', () => { selectedIndex = 0; renderList(); });
+filterDomain.addEventListener('change', () => { selectedIndex = 0; renderList(); });
+
+document.getElementById('prevBtn').addEventListener('click', () => {
+  if(!filtered.length) return;
+  selectedIndex = (selectedIndex - 1 + filtered.length) % filtered.length;
+  renderList();
+});
+document.getElementById('nextBtn').addEventListener('click', () => {
+  if(!filtered.length) return;
+  selectedIndex = (selectedIndex + 1) % filtered.length;
+  renderList();
+});
+
+renderList();
+</script>
+</body>
+</html>
